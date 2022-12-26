@@ -1,0 +1,28 @@
+{% load static %}
+{% load image_tags %}
+{% load purchase_info_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="header">
+        {% for object in get_product  %}
+                                    {% with image=object.primary_image %}
+                                    {% oscar_thumbnail image.original "297x297" upscale=True as thumb %}
+                                    <img class="prd_itm_img" alt="{{object.title}}" src="{{thumb.url}}">
+                                    {% endwith %}>
+        <p>{{object.title}}</p>
+        <p>{{object.benifit1}}</p>
+                                    {% if available.basket_product %}
+                                    <h2 class="lssprs price-retail">₹{{available.line.stockrecord.price_retail}}</h2>
+                                    <h2 class="acprc selling-price">₹{{available.line.unit_price_excl_tax}}</h2>
+                                    {% endif %}
+        {% endfor %}
+    </div>
+</body>
+</html>
