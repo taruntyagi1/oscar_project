@@ -22,3 +22,20 @@ class HomepageView(TemplateView):
         context['featured_product'] = product.objects.filter(is_featured=True).filter(structure='parent')
         
         return context
+
+
+class productdetail(TemplateView):
+
+    template_name = 'product.html'
+
+    
+
+    def get_context_data(self, **kwargs):
+
+        context = super(productdetail,self).get_context_data(**kwargs)
+        context['product'] = product.objects.filter(is_featured=True).filter(structure='parent')
+        
+        return context
+
+
+  

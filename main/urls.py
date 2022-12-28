@@ -22,6 +22,7 @@ from django.conf import settings
 urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),
     path('',include('website.urls')),
+    path("api/", include("oscarapi.urls")),
 
     # The Django admin is not officially supported; expect breakage.
     # Nonetheless, it's often useful for debugging.

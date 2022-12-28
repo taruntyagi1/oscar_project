@@ -1,0 +1,318 @@
+{% load static %}
+{% load image_tags %}
+{% load purchase_info_tags %}
+{% load currency_filters %}
+{% load go_to_cart_product %}
+{% load product_tags %}
+{% load display_tags %}
+{% load category_saperator %}
+{% load basket_tags %}
+
+
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://livejs.com/live.js"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="main_section">
+        <div class="container">
+            <div class="header">
+                <a href = "{% url 'basket:summary' %}"class="cart_btn"><i  class="fas fa-shopping-cart    "></i></a>
+                <a class = "usr"href="{% url 'customer:summary' %}">Profile</a>
+                
+            </div>
+        {% for product in product  %}
+    <div class="card" style="width: 18rem;">
+        {% with image=product.primary_image   %}
+
+        {% oscar_thumbnail image.original "297x297" upscale=True as thumb %}
+        <img src="{{thumb.url}}" alt="{{product.title}}" title="{{product.title}}">
+        <img class="skeleton-img skeleton" src="" alt="">
+        
+        {% endwith %}
+        <div class="card-body">
+          <h5 class="card-title">{{product.title}}</h5>
+          <h5 class="skeleton-title skeleton"></h5>
+          <h6 class="card-text">{{product.benifit1}}</h6>
+          <h6 class="skeleton-benifit skeleton"></h6>
+          <h6 class="card-text">{{product.benifit2}}</h6>
+          {% go_to_cart_product  product=product request=request.basket.all_lines as available %}
+          <div class="dt_slctor">                                 
+            <select class="form-control variant-select" data-line-id="{{available.line.id}}" data-cart-id="{{request.basket.id}}">
+                {% for child in product.variants_list %}
+                    {% if child.title == available.basket_product %}
+                    
+                    <option value="{{child.id}}" data-title ="{{child.title}}" data-description="{{child.additional_information|safe|striptags|truncatechars:50}}" data-discount="{{child.percent_discount}}" data-retail-price="{{child.stockrecords.first.price}}" data-selling-price={{child.stockrecords.first.price|currency}} selected>{{child.title}}</option>
+                    {% else %}
+                    <option value="{{child.id}}" data-description="{{child.additional_information|safe|striptags|truncatechars:50}}" data-discount="{{child.percent_discount}}" data-retail-price="{{child.stockrecords.first.price}}" data-selling-price={{child.stockrecords.first.price|currency}}>{{child.title}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <p class="acprc selling-price card-price">{{product.variants_list.0.stockrecords.first.price|currency}}</p>
+
+        
+        <div class="btn_crtby">
+            {% if product.variants_list|length > 0 %}
+                {% with products=product.variants_list.0 %}
+                    <div class="w-50 go-to-cart-btn" {% if not available.status == True %} style="display: none;" {% endif %}>
+                        <a class="btn btn_fill" style="background-color: #38b245; border-color: #38b245; font-size: 14px;" href="{% url 'basket:summary' %}">                                                
+                            Added
+                            <i class="fa fa-circle-o-notch fa-spin cart-btn-loader d-none"></i>
+                        </a>
+                    </div>
+                    {% purchase_info_for_product request product as session %}
+                    <div class="w-50" {% if available.status == True %} style="display: none;" {% endif %}>
+                        <a  class="btn btn_fill popup-add-to-cart-btn" href="javascript:void(0);" data-ptitle="{{product.title}}">                                                
+                            <span class="m_icon"><i class="ri-shopping-cart-2-fill"></i></span>
+                            Add To Cart
+                            <i class="fa fa-circle-o-notch fa-spin cart-btn-loader d-none"></i>
+                            <!-- <i class="fa fa-shopping-cart" style="display: none;"></i> -->
+                        </a>
+                    </div>  
+                    <div class="w-50">
+                        <a class="btn_outline item-add-to-cart-btn" href="javascript:void(0);">Buy Now</a>
+                    </div>
+                {% endwith %}
+            {% endif %}
+        </div>                    
+        
+
+
+          
+          
+        </div>
+      </div>
+    
+    {% endfor %}
+</div>
+</div>
+  </body>
+  <style>
+    .main_section .container{
+        display: flex;
+        position: relative;
+        top: 25px;
+        gap: 10px;
+        
+    }
+    .card-price{
+        font-weight: 500;
+        font-size: 20px;
+        margin-top: 5px;
+    }
+    .cart_btn{
+        position: fixed;
+        right: 50px;
+        font-size: 20px;
+        text-decoration: none;
+        color: black;
+    }
+    .usr{
+        position: fixed;
+        text-decoration: none;
+        color: black;
+        right: 120px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .usr:hover{
+        transform: scale(1.15);
+        transition: 1s linear;
+    }
+    .skeleton {
+        animation: skeleton-loading 1s linear infinite alternate;
+      }
+      
+      @keyframes skeleton-loading {
+        0% {
+          background-color: hsl(200, 20%, 80%);
+        }
+        100% {
+          background-color: hsl(200, 20%, 95%);
+        }
+      }
+      .skeleton-img{
+        width: 287px;
+        height: 286px;
+        position: fixed;
+        
+      }
+      .skeleton-title{
+        width: 180px;
+        height: 26px;
+        position: relative;
+        top: -31px;
+      }
+      .skeleton-benifit{
+        width: 150px;
+        height: 30px;
+        position: relative;
+        top: -30px;
+      }
+      
+  </style>
+  <script>
+    function SkeletonLoading(){
+        $('.skeleton').show()
+        setTimeout(function(){
+            $('.skeleton').hide()
+
+        },3000);
+    };
+    SkeletonLoading()
+    
+    
+
+    $('body').on('change', '.variant-select', function(){   
+        console.log("change")  
+        var child_title = $(this).find('option:selected').data('title')
+        var retail_price = $(this).find('option:selected').data('retailPrice');
+        var selling_price = $(this).find('option:selected').data('sellingPrice');
+        var discount_price = $(this).find('option:selected').data('discount');
+        $('.w-50').show()
+        $('.go-to-cart-btn').hide()
+        // var product_description = $(this).find('option:selected').data('description');
+        if(discount_price == 0){
+                    $(this).parents('.featured-product-card').find('.discount_percent').hide();
+                }
+                else{
+                    $(this).parents('.featured-product-card').find('.discount_percent').show();
+                }
+                var product_id = $(this).val();
+                $(this).parents('.card').find('.price-retail').text(retail_price);
+                $(this).parents('.card').find('.card-title').text(child_title);
+        $(this).parents('.card').find('.selling-price').text(selling_price);
+        // $(this).parents('.list-product-card').find('.product_description').text(product_description);
+        $(this).parents('.card').find('.discount-price').text(`${discount_price}% `);
+        var productId = $(this).val();
+        var cartId = $(this).data('cartId');
+        var lineId = $(this).data('lineId')
+        
+        var currentSelect = this;
+        removeBasketProduct(lineId,cartId,productId, currentSelect);
+    });
+
+
+    $('body').on('click', '.popup-add-to-cart-btn', function(){
+        var current_button = $(this);
+        var productName = $(this).data('ptitle');
+        
+        // var addToCartApiUrl = `${location.origin}/catalogue/api/v1/basket/add-product/`;
+        var addToCartApiUrl = `${location.origin}/api/basket/add-product/`;
+        var productId = $(this).parents('.card').find('.variant-select').val();
+        // var productApiUrl = `${location.origin}/catalogue/api/v1/product/${productId}/`;
+        var productApiUrl = `${location.origin}/api/products/${productId}/`;
+        var quantity = 1;
+        console.log(productApiUrl);
+        $.ajax({
+            url: addToCartApiUrl,
+            type: "post",
+            headers: {
+                'X-CSRFToken': '{{csrf_token}}'
+            },
+            data: JSON.stringify({
+                "url": productApiUrl,
+                "quantity": quantity,
+            }),
+            contentType: "application/json",
+            success: function (response) {                        
+                console.log(response);
+                
+                
+                
+                
+              
+                // $(current_button).hide();
+                $(current_button).parents('.card').find('.variant-select').data('lineId', response.current_line_id);
+                $(current_button).parents('.card').find('.go-to-cart-btn').show();
+                
+                 $(current_button).parents('.w-50').hide();
+                // $(current_button).parents('.list-product-card').find('.go-to-cart-btn').show();
+                
+            },
+            error: function (error) {
+                console.error(error);
+                $(current_button).find('.cart-btn-loader').addClass('d-none');
+                $(current_button).find('.cart-loader-remove').removeClass('d-none');
+                if(error.responseJSON && error.responseJSON.reason.url){
+                    alert(error.responseJSON.reason.url);
+                }
+                else if (error.responseJSON.reason){
+                    alert(error.responseJSON.reason);
+                }
+                else{
+                    alert('You cannot add this product');
+                }
+            },
+        });
+    });
+    
+    $('body').on('click', '.item-add-to-cart-btn', function(){
+        var current_button = $(this);
+        var productName = $(this).data('ptitle');
+        
+        // var addToCartApiUrl = `${location.origin}/catalogue/api/v1/basket/add-product/`;
+        var addToCartApiUrl = `${location.origin}/api/basket/add-product/`;
+        var productId = $(this).parents('.card').find('.variant-select').val();
+        // var productApiUrl = `${location.origin}/catalogue/api/v1/product/${productId}/`;
+        var productApiUrl = `${location.origin}/api/products/${productId}/`;
+        var quantity = 1;
+        console.log(productApiUrl);
+        $.ajax({
+            url: addToCartApiUrl,
+            type: "post",
+            headers: {
+                'X-CSRFToken': '{{csrf_token}}'
+            },
+            data: JSON.stringify({
+                "url": productApiUrl,
+                "quantity": quantity,
+            }),
+            contentType: "application/json",
+            success: function (response) {                        
+                console.log(response);
+                
+                
+                location.href = `${location.origin}/basket`
+                
+              
+                // $(current_button).hide();
+                $(current_button).parents('.card').find('.variant-select').data('lineId', response.current_line_id);
+                
+                
+                 $(current_button).parents('.w-50').hide();
+                // $(current_button).parents('.list-product-card').find('.go-to-cart-btn').show();
+                
+            },
+            error: function (error) {
+                console.error(error);
+                $(current_button).find('.cart-btn-loader').addClass('d-none');
+                $(current_button).find('.cart-loader-remove').removeClass('d-none');
+                if(error.responseJSON && error.responseJSON.reason.url){
+                    alert(error.responseJSON.reason.url);
+                }
+                else if (error.responseJSON.reason){
+                    alert(error.responseJSON.reason);
+                }
+                else{
+                    alert('You cannot add this product');
+                }
+            },
+        });
+    });
+</script>
+</html>
