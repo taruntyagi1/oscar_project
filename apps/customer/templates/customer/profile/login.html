@@ -1,0 +1,21 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="login_form" action="{{ request.get_full_path }}" method="post" class="well login-form">
+        {% csrf_token %}
+        {{login_form.email}}
+        {{login_form.password}}
+        <p class="login-font"><a href="{% url 'customer:change-password' %}">{% trans "I've forgotten my password" %}</a></p>
+        <button name="login_submit" type="submit" value="Log In" class="btn btn-lg btn-primary" data-loading-text="{% trans " Logging in... " %}">{% trans 'Login' %}</button>
+        <p class="login-font mt-2"><a href="{% url 'customer:register' %}">{% trans "Create an account" %}</a></p>
+    </form>
+</body>
+</html>

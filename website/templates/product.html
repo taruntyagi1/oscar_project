@@ -31,7 +31,14 @@
             <div class="header">
                 <a href = "{% url 'basket:summary' %}"class="cart_btn"><i  class="fas fa-shopping-cart    "></i></a>
                 <a class = "usr"href="{% url 'customer:summary' %}">Profile</a>
-                
+                <a class= "lgn_btn" href="{% url 'customer:login' %}">Login</a>
+                <style>
+                    .lgn_btn{
+                        text-decoration: none;
+                        color: black;
+                        font-weight: 500;
+                    }
+                </style>
             </div>
         {% for product in product  %}
     <div class="card" style="width: 18rem;">
@@ -176,7 +183,9 @@
     SkeletonLoading()
     
     
-
+    function Hideskeleton(){
+        $('.skeleton').hide()
+    }
     $('body').on('change', '.variant-select', function(){   
         console.log("change")  
         var child_title = $(this).find('option:selected').data('title')
@@ -232,7 +241,7 @@
             success: function (response) {                        
                 console.log(response);
                 
-                
+                Hideskeleton()  
                 
                 
               

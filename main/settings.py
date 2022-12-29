@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'website',
+    'account',
 
     'django.contrib.sites',
     'django.contrib.flatpages',
@@ -84,6 +85,8 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 1
+
+AUTH_USER_MODEL = 'account.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -142,8 +145,13 @@ WSGI_APPLICATION = 'main.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(os.path.join(BASE_DIR / 'db.sqlite3')),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'Instaclone',
+        'USER': 'postgres',
+        'PASSWORD': '123456',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+        'ATOMIC_REQUEST': True,
     }
 }
 
