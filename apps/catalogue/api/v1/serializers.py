@@ -4,11 +4,12 @@ from rest_framework import serializers
 # inter-app imports
 from catalogue.models import (
     DietitionsAndNutritionists,
-    Product,
+    product,
     Category,
     BannerImages,
     Option,
     Questionaire,
+    Product
 )
 from basket.models import Basket
 
@@ -166,3 +167,87 @@ class CustomAddProductSerializer(serializers.Serializer):  # pylint: disable=abs
     )
     options = OptionValueSerializer(many=True, required=False) 
 
+
+class ProductListSerializer(serializers.ModelSerializer):
+    """
+    serializer for blog list
+    """
+
+    image = serializers.SerializerMethodField()
+    selling_price = serializers.SerializerMethodField()
+    retail_price = serializers.SerializerMethodField()
+    detail_url = serializers.SerializerMethodField()
+    image_list = serializers.SerializerMethodField()
+    # categories = CategorySerializer(many=True, read_only=True)
+    stock_record = serializers.SerializerMethodField()
+    url = serializers.HyperlinkedIdentityField(
+        view_name='catalogue:product_detail',
+    )
+
+    class Meta:
+        model = Product
+        fields = (
+            'id',
+            'title',
+            'structure',
+            'image',
+            'categories',
+            'selling_price',
+            'retail_price',
+            'description',
+            'product_rating',
+            'product_rating_count',
+            'detail_url',
+            'attribute_summary',
+            'image_list',
+            'additional_information',
+            'ingredients',
+            'benefits',
+            'stock_record',
+            'url',
+            'children',
+        )
+
+        read_only_fields = (
+            'id',
+            'image',
+            'structure',
+            'selling_price',
+            'retail_price',
+            'detail_url',
+            'attribute_summary',
+            'image_list',
+            'stock_record',
+            'children',
+        )
+
+    def get_image(self, obj):
+        image = obj.primary_image()
+        if hasattr(image, 'original'):
+            return image.original.url
+        return None
+
+    def get_image_list(self, obj):
+        image_list = obj.get_all_images()
+        images_list = []
+        for obj in image_list:
+            image_dict = {
+                'image': obj.original.url,
+                'caption': obj.caption,
+                'display_order': obj.display_order,
+            }
+            images_list.append(image_dict)
+        return images_list
+
+    def get_stock_record(self, obj):
+        stock_record_list = []
+        stock_list = obj.stockrecords.all()
+        for obj in stock_list:
+            stock_dict = {
+                'partner_sku': obj.partner_sku,
+                'num_in_stock': obj.num_in_stock,
+                'num_allocated': obj.num_allocated,
+                'low_stock_threshold': obj.low_stock_threshold,
+            }
+            stock_record_list.append(stock_dict)
+        return stock_record_list

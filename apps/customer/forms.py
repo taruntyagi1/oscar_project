@@ -12,6 +12,9 @@ from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 
 
+from django.urls import reverse, reverse_lazy
+
+
 
 
 
@@ -49,14 +52,21 @@ class CustomAuthenticationForm(base_forms.EmailAuthenticationForm):
         email = self.cleaned_data.get('email')
         password = self.cleaned_data.get('password')
         print(self.cleaned_data)
+        
 
         
         if password:
             self.user_cache = authenticate(self.request, email=email, password=password)
+            if self.user_cache is not None:
+                print(True)
+            else:
+                print(False)
             if self.user_cache is None:
                 raise self.get_invalid_login_error()
             else:
                 self.confirm_login_allowed(self.user_cache)
+
+        return reverse('product')
        
 
 

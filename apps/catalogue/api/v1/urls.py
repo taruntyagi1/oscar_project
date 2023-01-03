@@ -16,6 +16,7 @@ from .views import (
     LineList,
     BasketLineDetail,
     AddProductView,
+    ProductView
   
 )
 
@@ -31,6 +32,7 @@ urlpatterns = [
     path("baskets/<int:pk>/lines/", LineList.as_view(), name="basket-lines-list"),
     path("baskets/<int:basket_pk>/lines/<int:pk>/", BasketLineDetail.as_view(), name="basket-line-detail",),
     path("basket/add-product/", AddProductView.as_view(), name="basket-add-product"),
+    path('product-view/',ProductView.as_view(),name='product-view')
 ]
 
 

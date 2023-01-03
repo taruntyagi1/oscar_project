@@ -37,6 +37,7 @@ from .serializers import (
     BasketSerializer,
     BasketLineSerializer,
     CustomAddProductSerializer,
+    ProductSerializer
 )
 from .pagination import ObjectPagination2x
 
@@ -44,6 +45,7 @@ from .pagination import ObjectPagination2x
 from oscar.core.loading import get_class, get_model
 from oscar.apps.payment.exceptions import PaymentError
 from oscar.apps.basket import signals
+from rest_framework import generics
 
 # oscar api imports
 from oscarapi.views import (
@@ -199,4 +201,9 @@ class AddProductView(basket.AddProductView):
 
 
 
+class ProductView(generics.ListAPIView):
+    def get(self,request):
 
+        queryset  = product.objects.filter(is_featured = True).filter(structure='parent')
+        serializer = ProductSerializer(queryset,many = True).data
+        return Response(serializer,status=status.HTTP_200_OK)
